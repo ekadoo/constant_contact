@@ -14,5 +14,18 @@ module ConstantContact
       lists = self.find :all
       lists.find{|list| list.Name == name}
     end
+    
+    #create list and assign contact
+    def self.create_and_assign_contacts(list_name,contacts=[])
+				list = List.new(:name=>list_name)
+				if list.save!
+					for contact in contacts
+							contact.add_to_list!(list.id)
+					end
+ 					return list	
+				else
+					false
+				end
+		end
   end
 end

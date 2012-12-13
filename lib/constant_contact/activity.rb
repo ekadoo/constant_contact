@@ -1,4 +1,3 @@
-
 module ConstantContact
   class Activity < Base
     self.format = ActiveResource::Formats::HtmlEncodedFormat

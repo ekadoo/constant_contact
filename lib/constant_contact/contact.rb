@@ -25,6 +25,25 @@ module ConstantContact
       end
     end
     
+		def self.import_contacts(contacts=[])
+			count = 0
+			for contact in contacts
+				c = Contact.new(:email_address=>contact[:email_address],:first_name=>contact[:first_name],:last_name=>contact[:last_name])
+				if c.save!
+ 						count = count + 1
+				end
+			end
+			return count
+		end
+
+		def add_to_list!(list_id)
+			if self.contact_lists.nil?
+					self.contact_lists = Array.new
+			end
+			self.contact_lists << list_id unless self.contact_lists.include?(list_id)
+			return self.contact_lists
+		end
+
     def opt_in_source
       @opt_in_source ||= "ACTION_BY_CUSTOMER"
     end
