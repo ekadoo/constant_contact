@@ -24,7 +24,7 @@ module ConstantContact
         end
       end
     end
-    
+
 		def self.import_contacts(contacts=[])
 			count = 0
 			for contact in contacts
@@ -35,6 +35,17 @@ module ConstantContact
 			end
 			return count
 		end
+
+ 		def save
+				super
+				Vendor.create(:constant_contact_id=>self.id)		
+	  end
+
+    def update_attributes(atts={})
+				super
+				Vendor.update_attributes(:constant_contact_id=>self.id,:bounces=>self.bounces,:opt_outs=>self.opt_outs)		
+		end
+
 
 		def add_to_list!(list_id)
 			if self.contact_lists.nil?
