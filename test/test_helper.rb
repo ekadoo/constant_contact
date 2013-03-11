@@ -2,7 +2,7 @@ require 'rubygems'
 require 'active_support/test_case'
 require 'test/unit'
 require 'shoulda'
-require 'mocha'
+require 'mocha/setup'
 require 'fakeweb'
 
 FakeWeb.allow_net_connect = false
