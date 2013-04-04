@@ -6,15 +6,15 @@ module ConstantContact
     # SCHEDULED   All campaigns that are currently scheduled to be sent some time in the future
     # DRAFT   All campaigns that have not yet been scheduled for delivery
     # RUNNING   All campaigns that are currently being processed and delivered
-    @@column_names = [:archive_status, :archive_url, :bounces, :campaign_type, :clicks, :contact_lists, :date, 
-                      :email_content, :email_content_format, :email_text_content, :forward_email_link_text, :forwards, 
-                      :from_email, :from_name, :greeting_name, :greeting_salutation, :greeting_string, 
-                      :include_forward_email, :include_subscribe_link, :last_edit_date, :name, :opens, :opt_outs, 
-                      :organization_address1, :organization_address2, :organization_address3, :organization_city, 
-                      :organization_country, :organization_international_state, :organization_name, :organization_postal_code, 
-                      :organization_state, :permission_reminder, :reply_to_email, :sent, :spam_reports, :status, 
-                      :style_sheet, :subject, :subscribe_link_text, :view_as_webpage, :view_as_webpage_link_text, :view_as_webpage_text] 
-    
+    @@column_names = [:archive_status, :archive_url, :bounces, :campaign_type, :clicks, :contact_lists, :date,
+                      :email_content, :email_content_format, :email_text_content, :forward_email_link_text, :forwards,
+                      :from_email, :from_name, :greeting_name, :greeting_salutation, :greeting_string,
+                      :include_forward_email, :include_subscribe_link, :last_edit_date, :name, :opens, :opt_outs,
+                      :organization_address1, :organization_address2, :organization_address3, :organization_city,
+                      :organization_country, :organization_international_state, :organization_name, :organization_postal_code,
+                      :organization_state, :permission_reminder, :reply_to_email, :sent, :spam_reports, :status,
+                      :style_sheet, :subject, :subscribe_link_text, :view_as_webpage, :view_as_webpage_link_text, :view_as_webpage_text]
+
 
     # Setup defaults when creating a new object since
     # CC requires so many extraneous fields to be present
@@ -24,7 +24,7 @@ module ConstantContact
       obj.set_defaults
       obj
     end
-        
+
     def to_xml
       xml = Builder::XmlMarkup.new
       xml.tag!("Campaign", :xmlns => "http://ws.constantcontact.com/ns/1.0/") do
@@ -36,12 +36,12 @@ module ConstantContact
       	xml.tag!("FromEmail") do
           xml.tag!('Email', :id => self.from_email_url)
     	  end
-      	xml.tag!("ContactLists") do 
+      	xml.tag!("ContactLists") do
       	  xml.tag!("ContactList", :id => self.contact_list)
       	end
-      end        
+      end
     end
-    
+
     def from_email_url
       EmailAddress.find(self.from_email).id
     end
@@ -49,8 +49,19 @@ module ConstantContact
     def reply_to_email_url
       from_email_url
     end
-    
-    
+
+    def statistics
+      campaign_data = Campaign.find(Campaign.parse_id(self.id))
+      {
+        :bounces => campaign_data.bounces,
+        :sent => campaign_data.sent,
+        :spam_reports => campaign_data.spam_reports,
+        :opt_outs => campaign_data.opt_outs
+      }
+    end
+
+
+
     protected
     def set_defaults
       self.view_as_webpage                  = 'NO' unless attributes.has_key?('ViewAsWebpage')
@@ -76,31 +87,30 @@ module ConstantContact
       self.organization_country             = 'US' unless attributes.has_key?('OrganizationCountry')
       self.organization_postal_code         = '64108' unless attributes.has_key?('OrganizationPostalCode')
     end
-    
+
     # Formats data if present.
     def before_save
       self.email_text_content = "<Text>#{email_text_content}</Text>" unless email_text_content.match /^\<Text/
-      self.date               = self.date.strftime(DATE_FORMAT) if attributes.has_key?('Date')      
+      self.date               = self.date.strftime(DATE_FORMAT) if attributes.has_key?('Date')
     end
-    
-    
+
     def validate
       # NOTE: Needs to be uppercase!
       unless attributes.has_key?('EmailContentFormat') && ['HTML', 'XHTML'].include?(email_content_format)
-        errors.add(:email_content_format, 'must be either HTML or XHTML (the latter for advanced email features)') 
+        errors.add(:email_content_format, 'must be either HTML or XHTML (the latter for advanced email features)')
       end
-      
+
       if attributes.has_key?('ViewAsWebpage') && view_as_webpage.downcase == 'yes'
         unless attributes['ViewAsWebpageLinkText'].present? && attributes['ViewAsWebpageText'].present?
           errors.add(:view_as_webpage, "You need to set view_as_webpage_link_text and view_as_webpage_link if view_as_webpage is YES")
         end
       end
 
-      errors.add(:email_content, 'cannot be blank') unless attributes.has_key?('EmailContent')       
-      errors.add(:email_text_content, 'cannot be blank') unless attributes.has_key?('EmailTextContent') 
-      errors.add(:name, 'cannot be blank') unless attributes.has_key?('Name') 
-      errors.add(:subject, 'cannot be blank') unless attributes.has_key?('Subject') 
+      errors.add(:email_content, 'cannot be blank') unless attributes.has_key?('EmailContent')
+      errors.add(:email_text_content, 'cannot be blank') unless attributes.has_key?('EmailTextContent')
+      errors.add(:name, 'cannot be blank') unless attributes.has_key?('Name')
+      errors.add(:subject, 'cannot be blank') unless attributes.has_key?('Subject')
     end
-    
+
   end
 end
