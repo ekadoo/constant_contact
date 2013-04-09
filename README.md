@@ -60,10 +60,10 @@ All examples require setting up either the specific class you'll be use or the B
 
 ### Schedule a campaign
 
-  schedule = ConstantContact::Schedule.new #Creates a new schedule
-  schedule.prefix_options[:campaign_id] = 1111440732165 #set the campaign you want to schedule by ID
-  schedule.scheduled_time = 12.hours.from_now #A Time value for schedule (you need to schedule always at least 5 hours before you plan to send the campaign)
-  schedule.save
+    schedule = ConstantContact::Schedule.new #Creates a new schedule
+    schedule.prefix_options[:campaign_id] = 1111440732165 #set the campaign you want to schedule by ID
+    schedule.scheduled_time = 12.hours.from_now #A Time value for schedule (you need to schedule always at least 5 hours before you plan to send the campaign)
+    schedule.save
 
 
 Copyright (c) 2009 Timothy Case, released under the MIT license
