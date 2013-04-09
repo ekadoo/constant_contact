@@ -1,6 +1,6 @@
 ConstantContact
 ===============
-This is a very ActiveResource-like ruby wrapper to the Constant Contact API.  It's not quite done yet and if you are interested in using this code, check it out, and message me with questions. 
+This is a very ActiveResource-like ruby wrapper to the Constant Contact API.  It's not quite done yet and if you are interested in using this code, check it out, and message me with questions.
 
 See the [ActiveResource::Base docs](http://api.rubyonrails.org/classes/ActiveResource/Base.html) for more information on how to use this ActiveResource-based wrapper.
 
@@ -51,6 +51,19 @@ All examples require setting up either the specific class you'll be use or the B
     c = ConstantContact::Contact.find_by_email('jon@example.com')
     @contact = ConstantContact::Contact.find(c.int_id) # Because Constant Contact doesn't return a full contact when searching by email
     puts 'In default contact list.' if @contact.contact_lists.include?(1) # contact_lists is an array of list ids
+
+
+### Statistics for a campaign
+
+    campaign = ConstantContact::Campaign.find(:first)
+    campaign.statistcs #returns an hash with bounces, sent, spam_reports and opt_outs
+
+### Schedule a campaign
+
+  schedule = ConstantContact::Schedule.new #Creates a new schedule
+  schedule.prefix_options[:campaign_id] = 1111440732165 #set the campaign you want to schedule by ID
+  schedule.scheduled_time = 12.hours.from_now #A Time value for schedule (you need to schedule always at least 5 hours before you plan to send the campaign)
+  schedule.save
 
 
 Copyright (c) 2009 Timothy Case, released under the MIT license
