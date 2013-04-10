@@ -51,7 +51,7 @@ module ConstantContact
     end
 
     def statistics
-      campaign_data = self.respond_to(:bounces) ? self : self.reload
+      campaign_data = self.respond_to?(:bounces) ? self : self.reload
       {
         :bounces => campaign_data.bounces,
         :sent => campaign_data.sent,

@@ -16,9 +16,9 @@ module ConstantContact
       lists.find{|list| list.Name == name}
     end
 
-    def add_member(member)
-      @new_members = [] unless defined?(@members)
-      @new_members << member
+    def enqueue_contact(contact)
+      @new_contacts = [] unless defined?(@new_contacts)
+      @new_contacts << contact
     end
 
     def subscribe_members!
