@@ -21,7 +21,7 @@ module ConstantContact
       # be treated like HTML
 
       # If it is set to XHTML, then the values in <EmailContent> will be treated
-      # like XHTML the same way it is treated in our UI, which means it will be 
+      # like XHTML the same way it is treated in our UI, which means it will be
       # subject to a more strict validation to ensure the XHTML is valid.  If it
       # is not valid, you will receive an error and the campaign will not be
       # created.  In addition, <TextContent> also must have some content in order
@@ -36,13 +36,13 @@ module ConstantContact
 
       # <IncludeFowardEmail> and <ForwardEmailLinkText>
       # If <IncludeFowardEmail> is set to 'YES', then the value in
-      # <ForwardEmailLinkText> will be used to insert a link in the campaign. 
+      # <ForwardEmailLinkText> will be used to insert a link in the campaign.
       # This is the same as "Forward Email to Friend" feature in the UI.  If
       # <IncludeForwardEmail> is set to 'NO', then <FowardEmailLinkText> will
       # be ignored.
 
       # <IncludeSubscribeLink> and <SubscribeLinkText>
-      # If <IncludeSubscribeLink> is set to 'YES', then the value in 
+      # If <IncludeSubscribeLink> is set to 'YES', then the value in
       # <SubscribeLinkText> will be used to insert a link in the forwarded email
       # for "Forward Email to Friend" feature in the UI.  If <IncludeSubscribeLink>
       # is set to 'NO', then <SubscribeLinkText> will be ignored.
@@ -54,7 +54,7 @@ module ConstantContact
     # when creating a new Campaign.
     def initialize(attributes = {}, persisted = false)
       attributes = attributes[0] if attributes.kind_of? Array
-      self.contact_lists = attributes.delete(:list_ids) if attributes.has_key? :list_ids 
+      self.contact_lists = attributes.delete(:list_ids) if attributes.has_key? :list_ids
       obj = super
       obj.set_defaults
       obj
@@ -64,13 +64,13 @@ module ConstantContact
       xml = Builder::XmlMarkup.new
       xml.tag!("Campaign", :xmlns => "http://ws.constantcontact.com/ns/1.0/") do
         self.attributes.reject {|k,v| ['FromEmail','ReplyToEmail','ContactList'].include?(k)}.each{|k, v| xml.tag!( k.to_s.camelize, v )}
-        xml.tag!("ReplyToEmail") { 
+        xml.tag!("ReplyToEmail") {
           xml.tag!('Email', :id => self.reply_to_email.url )
-          xml.tag!('EmailAddress', self.reply_to_email) 
+          xml.tag!('EmailAddress', self.reply_to_email)
         }
-        xml.tag!("FromEmail") { 
-          xml.tag!('Email', :id => self.from_email.url ) 
-          xml.tag!('EmailAddress', self.from_email) 
+        xml.tag!("FromEmail") {
+          xml.tag!('Email', :id => self.from_email.url )
+          xml.tag!('EmailAddress', self.from_email)
         }
         xml.tag!("ContactLists") do
           self.contact_lists.each do |list|
@@ -119,14 +119,14 @@ module ConstantContact
       update_attributes(defaults)
 
       # CampaignType
-      # Since the API only supports creating a custom-code campaign, 
+      # Since the API only supports creating a custom-code campaign,
       # there is no reason to specify <CampaignType>, which will be ignored.
 
       # there are several elements that are required even though they are not used
-      # by the server and are replaced upon a successful contact creation.  
+      # by the server and are replaced upon a successful contact creation.
       # These elements are <id>, <title>, <author>, and <updated> elements.
-      # The <title> and <author> elements may be empty. The <id> must contain 
-      # a URI, but since the value is not used by the server, any URI will work. 
+      # The <title> and <author> elements may be empty. The <id> must contain
+      # a URI, but since the value is not used by the server, any URI will work.
       # The server does not check for uniqueness when creating a contact because a
       # new unique ID will be created anyway. The <updated> element must contain a
       # date or date/time value, but again the value is not used by the server.
@@ -134,7 +134,6 @@ module ConstantContact
         :PermissionReminderText => "",
         :ViewAsWebpageLinkText => "",
         :ViewAsWebpageText => "",
-        :ProductID => "",
         :LetterImageList => "",
         :LastEditDate => "",
         :StyleSheet => "",
@@ -174,12 +173,11 @@ module ConstantContact
             key = search_attributes($`)
             attributes[key] if attributes.has_key?(key)
           else
-            restricted_values = get_restricted_values?($`) 
-            if restricted_values.include?($`)
-              attributes[search_attributes($`)] = arguments.first
-            else
-              raise ArgumentError, "Value must be one of #{restricted_values}" 
+            restricted_values = get_restricted_values?($`)
+            if restricted_values && !restricted_values.include?($`)
+              raise ArgumentError, "Value must be one of #{restricted_values}"
             end
+            attributes[search_attributes($`)] = arguments.first
           end
         end
       else
@@ -189,11 +187,7 @@ module ConstantContact
 
     def get_restricted_values?(attribute)
       const = "#{attribute.underscore.upcase}_VALUES".to_sym
-      if Campaign::const_defined?(const)
-        Campaign::const_get(const)
-      else
-        [attribute]
-      end
+      Campaign::const_defined?(const) ? Campaign::const_get(const) : nil
     end
 
     # Formats data if present.
