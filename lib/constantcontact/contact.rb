@@ -7,7 +7,7 @@ module ConstantContact
 
     def initialize(attributes = {}, persisted = false)
       attributes = attributes[0] if attributes.kind_of? Array
-      self.contact_lists = attributes.delete(:list_ids) if attributes.has_key? :list_ids 
+      self.contact_lists = attributes.delete(:list_ids) if attributes.has_key? :list_ids
       super
     end
 
@@ -15,10 +15,18 @@ module ConstantContact
     def opt_in_source
       @opt_in_source ||= "ACTION_BY_CUSTOMER"
     end
-    
+
     # see http://developer.constantcontact.com/doc/manageContacts#create_contact for more info about the two values.
     def opt_in_source=(val)
       @opt_in_source = val if ['ACTION_BY_CONTACT','ACTION_BY_CUSTOMER'].include?(val)
+    end
+
+    def subscribe!(list)
+      self.contact_lists ||= []
+      contact_list_ids = self.contact_lists.map { |l| l.id }
+      return true if contact_list_ids.include?(list.id)
+      self.contact_lists << list
+      save
     end
 
     def to_xml
