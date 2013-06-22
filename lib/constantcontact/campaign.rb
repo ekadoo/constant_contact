@@ -174,8 +174,8 @@ module ConstantContact
             attributes[key] if attributes.has_key?(key)
           else
             restricted_values = get_restricted_values?($`)
-            if restricted_values && !restricted_values.include?($`)
-              raise ArgumentError, "Value must be one of #{restricted_values}"
+            if restricted_values && !restricted_values.include?(arguments.first)
+              raise ArgumentError, "Value #{arguments.first} must be one of #{restricted_values}"
             end
             attributes[search_attributes($`)] = arguments.first
           end
