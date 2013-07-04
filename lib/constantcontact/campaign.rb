@@ -89,6 +89,16 @@ module ConstantContact
     alias :reply_to_email :from_email
     alias :from_email :from_email
 
+    def statistics
+      campaign_data = self.respond_to?(:bounces) ? self : self.reload
+      {
+        :bounces => campaign_data.bounces,
+        :sent => campaign_data.sent,
+        :spam_reports => campaign_data.spam_reports,
+        :opt_outs => campaign_data.opt_outs
+      }
+    end
+
     protected
 
     def set_defaults
